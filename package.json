@@ -48,7 +48,7 @@
     "codemirror": "^5.58.2",
     "cookie": "^0.4.1",
     "date-fns": "^2.19.0",
-    "debug": "^4.2.0",
+    "debug": "^4.3.3",
     "devtools-sprintf-js": "^1.0.3",
     "dotenv": "^10.0.0",
     "escape-html": "^1.0.3",
