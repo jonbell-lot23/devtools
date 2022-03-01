@@ -364,24 +364,13 @@
 
   /* CODE MIRROR */
 
-  /* THEME ONE */
   --cm-linenumber: var(--grey-40);
-  --cm-keyword: #fff;
-  --cm-def: #ff42a8;
-  --cm-string: #ff98eb;
-  --cm-variable: #01acfd;
+  --cm-keyword: #ff42a8;
+  --cm-def: #fff;
+  --cm-string: #01acfd;
+  --cm-variable: #58e0ff;
   --cm-number: yellow;
-  --cm-property: #fff;
-  --cm-atom: #fff;
-
-  /* THEME TWO */
-  --cm-linenumber: var(--grey-40);
-  --cm-keyword: #ff98eb;
-  --cm-def: #ff42a8;
-  --cm-string: #58e0ff;
-  --cm-variable: #01acfd;
-  --cm-number: yellow;
-  --cm-property: #fff;
+  --cm-property: #ff98eb;
   --cm-atom: #fff;
 
   /* Toolbar */
