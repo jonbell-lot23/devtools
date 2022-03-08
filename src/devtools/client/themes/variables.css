@@ -397,7 +397,7 @@
   --breakpoint-status: var(--theme-body-color);
   --breakpoint-arrow: #fff;
   --breakpoint-arrow-disabled: var(--theme-base-80);
-
+  --theme-menu-highlight: var(--theme-base-100);
   --text-field-border: var(--theme-base-85);
   --jellyfish: rgba(40, 40, 40, 0.8);
   --theme-border: var(--theme-base-100);
