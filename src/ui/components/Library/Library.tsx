@@ -1,166 +1,155 @@
-import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import useAuth0 from "ui/utils/useAuth0";
-import LogRocket from "ui/utils/logrocket";
-import hooks from "ui/hooks";
-import * as actions from "ui/actions/app";
-import { Workspace } from "ui/types";
-import { UIState } from "ui/state";
-import * as selectors from "ui/reducers/app";
-import { Nag, useGetUserInfo } from "ui/hooks/users";
-import { removeUrlParameters } from "ui/utils/environment";
-import { setExpectedError } from "ui/actions/session";
-import LoadingScreen from "../shared/LoadingScreen";
-import Sidebar from "./Sidebar";
-import ViewerRouter from "./ViewerRouter";
-import { TextInput } from "../shared/Forms";
-import LaunchButton from "../shared/LaunchButton";
-import { trackEvent } from "ui/utils/telemetry";
-import styles from "./Library.module.css";
-import {
-  downloadReplay,
-  firstReplay,
-  hasTeamInvitationCode,
-  isTeamLeaderInvite,
-  singleInvitation,
-} from "ui/utils/onboarding";
-import { useRouter } from "next/router";
+import React, { useState } from "react";
+import { Recording } from "ui/types";
+import { RecordingId } from "@recordreplay/protocol";
+import BatchActionDropdown from "./BatchActionDropdown";
+import { isReplayBrowser } from "ui/utils/environment";
+import { PrimaryButton, SecondaryButton } from "../shared/Button";
+import RecordingRow from "./RecordingRow";
+import ViewerHeader, { ViewerHeaderLeft } from "./ViewerHeader";
+import sortBy from "lodash/sortBy";
+import TeamTrialEnd from "./TeamTrialEnd";
 
-function isUnknownWorkspaceId(
-  id: string | null,
-  workspaces: Workspace[],
-  pendingWorkspaces?: Workspace[]
-) {
-  const associatedWorkspaces = [{ id: null }, ...workspaces];
-
-  // Add the pending workspaces, if any.
-  if (pendingWorkspaces) {
-    associatedWorkspaces.push(...pendingWorkspaces);
+const subStringInString = (subString: string, string: string | null) => {
+  if (!string) {
+    return false;
   }
 
-  return !associatedWorkspaces.map(ws => ws.id).includes(id);
+  return string.toLowerCase().includes(subString.toLowerCase());
+};
+
+function getErrorText() {
+  if (isReplayBrowser()) {
+    return "Please open a new tab and press the blue record button to record a Replay";
+  }
+
+  return <DownloadLinks />;
 }
 
-function FilterBar({
-  searchString,
-  setSearchString,
-}: {
-  searchString: string;
-  setSearchString: Dispatch<SetStateAction<string>>;
-}) {
-  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchString(e.target.value);
-  };
+function DownloadLinks() {
+  const [clicked, setClicked] = useState(false);
+
+  if (clicked) {
+    return (
+      <div className="flex flex-col space-y-6" style={{ maxWidth: "24rem" }}>
+        <div>Download started.</div>
+        <div>{`Once the download is finished, open the Replay Browser installer to install Replay`}</div>
+      </div>
+    );
+  }
 
   return (
-    <div
-      className={`flex flex-grow flex-row items-center space-x-3 text-sm text-gray-500 ${styles.librarySearch}`}
-    >
-      <div className="material-icons">search</div>
-      <TextInput value={searchString} onChange={onChange} placeholder="Search" />
+    <div className="flex flex-col space-y-6 text-sm" style={{ maxWidth: "24rem" }}>
+      <div className="text-lg">{`👋 This is where your replays will go!`}</div>
     </div>
   );
 }
 
-function LibraryLoader(props: PropsFromRedux) {
-  const auth = useAuth0();
-  const { userSettings, loading: userSettingsLoading } = hooks.useGetUserSettings();
-  const userInfo = hooks.useGetUserInfo();
-  const { workspaces, loading: loading1 } = hooks.useGetNonPendingWorkspaces();
-  const { pendingWorkspaces, loading: loading2 } = hooks.useGetPendingWorkspaces();
-  const { nags, loading: loading3 } = useGetUserInfo();
-
-  useEffect(() => {
-    if (!userInfo.loading && !userSettingsLoading) {
-      LogRocket.createSession({ userInfo, auth0User: auth.user, userSettings });
-    }
-  }, [auth, userInfo, userSettings, userSettingsLoading]);
-
-  if (loading1 || loading2 || loading3) {
-    return <LoadingScreen />;
-  }
-
-  return <Library {...{ ...props, workspaces, pendingWorkspaces, nags }} />;
-}
-
-type LibraryProps = PropsFromRedux & {
-  workspaces: Workspace[];
-  pendingWorkspaces?: Workspace[];
-  nags: Nag[];
-};
-
-function Library({
-  setWorkspaceId,
-  setModal,
-  currentWorkspaceId,
-  workspaces,
-  pendingWorkspaces,
-  nags,
-}: LibraryProps) {
-  const router = useRouter();
-  const [searchString, setSearchString] = useState("");
-  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
-  const dismissNag = hooks.useDismissNag();
-
-  useEffect(function handleDeletedTeam() {
-    // After rendering null, update the workspaceId to display the user's library
-    // instead of the non-existent team.
-    if (![{ id: null }, ...workspaces].some(ws => ws.id === currentWorkspaceId)) {
-      setWorkspaceId(null);
-      updateDefaultWorkspace({ variables: { workspaceId: null } });
-    }
-  }, []);
-  useEffect(function handleOnboardingModals() {
-    if (singleInvitation(pendingWorkspaces?.length || 0, workspaces.length)) {
-      trackEvent("onboarding.team_invite");
-      setModal("single-invite");
-    } else if (downloadReplay(nags, dismissNag)) {
-      trackEvent("onboarding.download_replay_prompt");
-      setModal("download-replay");
-    } else if (firstReplay(nags)) {
-      trackEvent("onboarding.demo_replay_prompt");
-      setModal("first-replay");
-    }
-  }, []);
-
-  // FIXME [ryanjduffy]: Backwards compatibility for ?replayinvite=true flow
-  if (isTeamLeaderInvite()) {
-    router.replace("/team/new");
-    return null;
-  }
-
-  // Handle cases where the default workspace ID in prefs is for a team
-  // that the user is no longer a part of. This occurs when the user is removed
-  // from a team that is stored as their default library team in prefs. We return
-  // null here, and reset the currentWorkspaceId to the user's library in `handleDeletedTeam`.
-  // This also handles cases where the selected ID actually corresponds to a pending team.
-  if (isUnknownWorkspaceId(currentWorkspaceId, workspaces, pendingWorkspaces)) {
-    return <LoadingScreen />;
-  }
+export default function Viewer({
+  recordings,
+  workspaceName,
+  searchString,
+}: {
+  recordings: Recording[];
+  workspaceName: string | React.ReactNode;
+  searchString: string;
+}) {
+  const filteredRecordings = searchString
+    ? recordings.filter(
+        r => subStringInString(searchString, r.url) || subStringInString(searchString, r.title)
+      )
+    : recordings;
 
   return (
-    <main className="flex h-full w-full flex-row">
-      <Sidebar nonPendingWorkspaces={workspaces} />
-      <div className="flex flex-grow flex-col overflow-x-hidden">
-        <div className="flex h-16 flex-row items-center space-x-3 border-b border-gray-300 bg-white p-5">
-          <FilterBar searchString={searchString} setSearchString={setSearchString} />
-          <LaunchButton />
-        </div>
-        <ViewerRouter searchString={searchString} />
-      </div>
-    </main>
+    <div className="flex flex-grow flex-col space-y-5 overflow-hidden bg-gray-100 px-8 py-6">
+      <ViewerContent {...{ workspaceName, searchString }} recordings={filteredRecordings} />
+    </div>
   );
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    currentWorkspaceId: selectors.getWorkspaceId(state),
-  }),
-  {
-    setWorkspaceId: actions.setWorkspaceId,
-    setModal: actions.setModal,
-    setExpectedError,
+function ViewerContent({
+  recordings,
+  workspaceName,
+}: {
+  recordings: Recording[];
+  workspaceName: string | React.ReactNode;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const addSelectedId = (recordingId: RecordingId) => setSelectedIds([...selectedIds, recordingId]);
+  const removeSelectedId = (recordingId: RecordingId) =>
+    setSelectedIds(selectedIds.filter(id => id !== recordingId));
+  const handleDoneEditing = () => {
+    setSelectedIds([]);
+    setIsEditing(false);
+  };
+
+  const HeaderLeft = (
+    <ViewerHeaderLeft>
+      <span>{workspaceName}</span>
+      <span>{recordings.length != 0 ? <>({recordings.length})</> : <></>}</span>
+    </ViewerHeaderLeft>
+  );
+
+  if (!recordings.length) {
+    const errorText = getErrorText();
+
+    // if (searchString) {
+    //   errorText = "No replays found, please expand your search";
+    // } else {
+    //   errorText = getErrorText();
+    // }
+
+    return (
+      <>
+        <ViewerHeader>{HeaderLeft}</ViewerHeader>
+        <section className="grid flex-grow items-center justify-center bg-gray-100 text-sm">
+          <span className="text-gray-500">{errorText}</span>
+        </section>
+      </>
+    );
   }
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(LibraryLoader);
+
+  let sortedRecordings = sortBy(recordings, recording => {
+    const ascOrder = false;
+    const order = ascOrder ? 1 : -1;
+    return order * new Date(recording.date).getTime();
+  });
+
+  return (
+    <>
+      <ViewerHeader>
+        {HeaderLeft}
+        <div className="flex flex-row items-center space-x-3">
+          <TeamTrialEnd />
+          {isEditing ? (
+            <>
+              <BatchActionDropdown setSelectedIds={setSelectedIds} selectedIds={selectedIds} />
+              <PrimaryButton color="blue" onClick={handleDoneEditing}>
+                Done
+              </PrimaryButton>
+            </>
+          ) : (
+            <SecondaryButton
+              className="bg-white hover:bg-primaryAccentHover hover:text-white"
+              color="blue"
+              onClick={() => setIsEditing(true)}
+            >
+              Edit
+            </SecondaryButton>
+          )}
+        </div>
+      </ViewerHeader>
+      <div className="recording-list flex flex-col overflow-y-auto rounded-md bg-white text-sm shadow-md">
+        {sortedRecordings.map((r, i) => (
+          <RecordingRow
+            key={i}
+            recording={r}
+            selected={selectedIds.includes(r.id)}
+            {...{ addSelectedId, removeSelectedId, isEditing }}
+          />
+        ))}
+      </div>
+    </>
+  );
+}
