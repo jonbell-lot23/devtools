@@ -56,7 +56,7 @@ module.exports = {
         "ew-resize": "ew-resize",
       },
       transitionDuration: {
-        '6000': '6000ms',
+        '3000': '3000ms',
       }
     },
   },
