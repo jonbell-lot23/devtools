@@ -38,7 +38,7 @@
     "@heroicons/react": "^1.0.6",
     "@redux-devtools/app": "^2.1.4",
     "@redux-devtools/extension": "^3.2.2",
-    "@reduxjs/toolkit": "^1.8.1",
+    "@reduxjs/toolkit": "^1.8.2",
     "@replayio/protocol": "^0.31.0",
     "@sentry/react": "^6.19.4",
     "@sentry/tracing": "^6.19.6",
