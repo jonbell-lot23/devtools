@@ -3937,6 +3937,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sentry/core@npm:7.15.0":
+  version: 7.15.0
+  resolution: "@sentry/core@npm:7.15.0"
+  dependencies:
+    "@sentry/types": 7.15.0
+    "@sentry/utils": 7.15.0
+    tslib: ^1.9.3
+  checksum: 3a0c410a186f062ba026c85729e35ee78d99e8d124036742fb52e8064f95c32a5d9516514bfb0e52fcd3bfd8ff96678eb586f351e2ed270d8c7733c98cc77548
+  languageName: node
+  linkType: hard
+
 "@sentry/core@npm:7.9.0":
   version: 7.9.0
   resolution: "@sentry/core@npm:7.9.0"
@@ -3975,15 +3986,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/tracing@npm:^7.9.0":
-  version: 7.9.0
-  resolution: "@sentry/tracing@npm:7.9.0"
+"@sentry/tracing@npm:^7.15.0":
+  version: 7.15.0
+  resolution: "@sentry/tracing@npm:7.15.0"
   dependencies:
-    "@sentry/hub": 7.9.0
-    "@sentry/types": 7.9.0
-    "@sentry/utils": 7.9.0
+    "@sentry/core": 7.15.0
+    "@sentry/types": 7.15.0
+    "@sentry/utils": 7.15.0
     tslib: ^1.9.3
-  checksum: e8e8cfecbb4647aeea849225c7c898bde1c9029b0bdf75984109a19668fcd99a62abe93d4115b5dccd484f0f7e0b378a0715f830bcf5a2788e23e69c8199145d
+  checksum: 6eddab4e20431b37cd6a85d6b41d14155d694df200fee204c285cdc88e2659d02e3c898344ff366dbdd53c7204b0ba300b16e9c1b62db91c815d615670ae4193
+  languageName: node
+  linkType: hard
+
+"@sentry/types@npm:7.15.0":
+  version: 7.15.0
+  resolution: "@sentry/types@npm:7.15.0"
+  checksum: 114fb1eeacce6a92fc50e9b8ecf35ccef6993cb43c7b428c06394177d8ed0e42ee84ec64e801356c6a0190d4aa71d032cf82ee9e34a976b634dac6a0c284361a
   languageName: node
   linkType: hard
 
@@ -3991,6 +4009,16 @@ __metadata:
   version: 7.9.0
   resolution: "@sentry/types@npm:7.9.0"
   checksum: 5f56d27454cab0344554bd85e9db8c34827dffa61145150664dc1ff478aaf599bffceb3a6bb20f592f0d8080b1f26b7af03c306a09c6463b8de4bdfdd10eecba
+  languageName: node
+  linkType: hard
+
+"@sentry/utils@npm:7.15.0":
+  version: 7.15.0
+  resolution: "@sentry/utils@npm:7.15.0"
+  dependencies:
+    "@sentry/types": 7.15.0
+    tslib: ^1.9.3
+  checksum: 9445a78c23b230a39d05c4ff44fb02f66bbb4dd4638216419b99ab53fa403bf613ea175c642b0bc015038370d229af76046689a08efe5a030d64b5cb0e02cfa1
   languageName: node
   linkType: hard
 
@@ -20535,7 +20563,7 @@ __metadata:
     "@replayio/protocol": ^0.31.1
     "@replayio/replay": ^0.4.2
     "@sentry/react": ^7.9.0
-    "@sentry/tracing": ^7.9.0
+    "@sentry/tracing": ^7.15.0
     "@storybook/addon-actions": ^6.4.20
     "@storybook/addon-essentials": ^6.5.9
     "@storybook/addon-links": ^6.4.20
