@@ -146,6 +146,11 @@
   --value-type-html-tag-bracket: #e6e9ec;
   --value-type-html-text: #d7d7db;
 
+  --progress-playing-background: #2d4a65;
+  --progressbar-background: var(--theme-base-90);
+  --replay-head-background: var(--theme-highlight-purple);
+  --progressbar-unfocused-background: #8fa7be;
+
   --point-panel-background-color: #1f2b43;
   --point-panel-button-background-color: #8a8f95;
   --point-panel-input-background-color: #000000;
@@ -333,6 +338,11 @@
   --value-type-html-tag: #0074e8;
   --value-type-html-tag-bracket: #0c0c0d;
   --value-type-html-text: #0c0c0d;
+
+  --progress-playing-background: red;
+  --progressbar-background: var(--theme-base-100);
+  --replay-head-background: var(--purple-50);
+  --progressbar-unfocused-background: var(--theme-base-70);
 
   --point-panel-background-color: #f0f1f4;
   --point-panel-button-background-color: #e6e6e6;
