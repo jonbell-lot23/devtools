@@ -152,7 +152,7 @@
   --modal-border: none;
   --tab-bgcolor-alt-subtle: var(--theme-base-100); /* info, events */
   --tab-bgcolor: var(--theme-base-90); /* bg tabs */
-  --theme-border: #d2d5da;
+
   --icon-color: var(--body-color);
   --theme-focuser-bgcolor: var(--primary-accent);
   --theme-sidebar-background: var(--theme-base-100);
@@ -435,7 +435,7 @@
   --tab-bgcolor-alt-subtle: var(--theme-base-95); /* info, events */
   --tab-bgcolor: var(--theme-base-100); /* bg tabs */
   --body-bgcolor: var(--theme-base-95);
-  --theme-border: var(--theme-base-100);
+
   --icon-color: var(--body-color);
   --theme-focuser-bgcolor: var(--primary-accent);
   --theme-sidebar-background: var(--body-bgcolor);
