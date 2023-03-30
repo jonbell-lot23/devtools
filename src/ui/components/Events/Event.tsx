@@ -16,12 +16,15 @@ import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { getFunctionBody } from "protocol/evaluation-utils";
 import type { ThreadFront as TF } from "protocol/thread";
 import { RecordingTarget } from "protocol/thread/thread";
+import Icon from "replay-next/components/Icon";
+import { useNag } from "replay-next/src/hooks/useNag";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { EventLog, eventsMapper } from "replay-next/src/suspense/EventsCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
+import { Nag } from "shared/graphql/types";
 import type { UIThunkAction } from "ui/actions";
 import { SEARCHABLE_EVENT_TYPES, eventListenerLocationCache } from "ui/actions/event-listeners";
 import { setViewMode } from "ui/actions/layout";
@@ -278,11 +281,14 @@ export default React.memo(function Event({
   const label = getEventLabel(event);
   const { icon } = getReplayEvent(kind);
   const [jumpToCodeStatus, setJumpToCodeStatus] = useState<JumpToCodeStatus>("not_checked");
+  const [jumpToCodeState, dismissJumpToCodeNag] = useNag(Nag.JUMP_TO_CODE);
+  const [jumpToEventState, dismissJumpToEventNag] = useNag(Nag.JUMP_TO_EVENT);
 
   const onKeyDown = (e: React.KeyboardEvent) => e.key === " " && e.preventDefault();
 
   const onClickSeek = () => {
     onSeek(point, time);
+    dismissJumpToEventNag(); // Replay Assist
   };
 
   const onClickJumpToCode = async () => {
@@ -305,6 +311,9 @@ export default React.memo(function Event({
         }, 5000);
       }
     }
+
+    // update Replay Assist
+    dismissJumpToCodeNag();
   };
 
   const { contextMenu, onContextMenu } = useEventContextMenu(event);
