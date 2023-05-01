@@ -190,9 +190,9 @@ const Passport = () => {
     return Math.floor(Math.random() * (max - min + 1) + min);
   };
 
-  const [randomBottom, setRandomBottom] = useState(rand(220, 320));
-  const [randomRight, setRandomRight] = useState(rand(-50, 0));
-  const [randomRotation, setRandomRotation] = useState(rand(-20, 20));
+  const [randomBottom, setRandomBottom] = useState(() => rand(220, 320));
+  const [randomRight, setRandomRight] = useState(() => rand(-50, 0));
+  const [randomRotation, setRandomRotation] = useState(() => rand(-20, 20));
 
   const renderSection = (section: Section, sectionIndex: number) => {
     return (
